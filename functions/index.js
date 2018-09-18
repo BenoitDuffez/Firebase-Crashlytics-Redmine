@@ -23,6 +23,7 @@ function getIssuePriorities() {
   const api_key = functions.config().redmine.api_key;
   const url = `${server_url}/enumerations/issue_priorities.json?key=${api_key}`;
 
+  console.log(`Running GET on ${url}`);
   return rp({
     method: 'GET',
     uri: url,
@@ -34,7 +35,6 @@ function getIssuePriorities() {
 async function calculateIssuePriority(callback, eventType) {
     // Get list of available issue priorities
     const result = await getIssuePriorities();
-    console.log(result.issue_priorities);
 
     // Map the Redmine priority label from the event type
     var priorityName;
@@ -45,6 +45,7 @@ async function calculateIssuePriority(callback, eventType) {
     } else {
       priorityName = 'Normal';
     }
+    console.log(`Event type is ${eventType} => ${priorityName}; try to get the best priority from: ${result.issue_priorities}`);
 
     // Search for the target priority
     for (var i = 0; i < result.issue_priorities.length; i++) {
@@ -83,6 +84,9 @@ function createRedmineIssue(summary, description, priority) {
     },
   };
 
+  console.log(`POSTing to ${url}, issue is:`);
+  console.log(newIssue);
+
   return rp({
     method: 'POST',
     uri: url,
@@ -101,6 +105,9 @@ exports.sendOnNewIssue = functions.crashlytics.issue().onNew(async (issue) => {
   const appId = issue.appInfo.appId;
   const appPlatform = issue.appInfo.appPlatform;
   const latestAppVersion = issue.appInfo.latestAppVersion;
+
+  console.log(`Received issue:`);
+  console.log(issue);
 
   const summary = `[Firebase] New Issue ${issueId} in ${appName} on ${appPlatform}`;
   const description = `There is a new issue - ${issueTitle} in ${appId}, version ${latestAppVersion}`;
