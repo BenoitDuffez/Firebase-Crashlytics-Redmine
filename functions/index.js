@@ -47,14 +47,14 @@ async function calculateIssuePriority(callback, eventType) {
     }
 
     // Search for the target priority
-    for (var i = 0; i < result.issue_priorities; i++) {
+    for (var i = 0; i < result.issue_priorities.length; i++) {
       if (result.issue_priorities[i].name == priorityName) {
         return result.issue_priorities[i].id;
       }
     }
 
     // Not found? Use Redmine's default priority
-    for (var i = 0; i < result.issue_priorities; i++) {
+    for (var i = 0; i < result.issue_priorities.length; i++) {
       if (result.issue_priorities[i].is_default === true) {
         return result.issue_priorities[i].id;
       }
